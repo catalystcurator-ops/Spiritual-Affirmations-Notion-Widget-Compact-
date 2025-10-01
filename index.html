@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spiritual Affirmations Carousel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: transparent;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .carousel-container {
+            max-width: 100%;
+            width: 100%;
+            background: rgba(20, 20, 20, 0.95);
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin: 0 auto;
+        }
+
+        .carousel-header {
+            background: rgba(0, 0, 0, 0.4);
+            color: #ffffff;
+            padding: 19px 24px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .carousel-header h1 {
+            font-size: 19px;
+            margin-bottom: 5px;
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
+
+        .carousel-header p {
+            font-size: 10px;
+            opacity: 0.7;
+            font-weight: 300;
+        }
+
+        .card-container {
+            position: relative;
+            min-height: 361px;
+            overflow: hidden;
+        }
+
+        .affirmation-card {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 24px 28px;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.5s ease-in-out;
+        }
+
+        .affirmation-card.active {
+            opacity: 1;
+            transform: translateX(0);
+            position: relative;
+        }
+
+        .affirmation-card.prev {
+            transform: translateX(-100%);
+            opacity: 0;
+        }
+
+        .day-badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            padding: 4px 13px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 300;
+            margin-bottom: 17px;
+            letter-spacing: 1.5px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .affirmation-text {
+            font-size: 21px;
+            font-weight: 300;
+            color: #ffffff;
+            line-height: 1.35;
+            margin-bottom: 19px;
+            font-style: normal;
+            letter-spacing: 0.3px;
+        }
+
+        .detail-section {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 11px 15px;
+            border-radius: 4px;
+            margin-bottom: 9px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .detail-section h3 {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #ffffff;
+            margin-bottom: 6px;
+            font-weight: 700;
+        }
+
+        .detail-section p {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.45;
+            font-weight: 300;
+        }
+
+        .scripture-ref {
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 400;
+        }
+
+        .spirit-tag {
+            display: inline-block;
+            background: rgba(220, 38, 38, 0.2);
+            color: #fca5a5;
+            padding: 5px 11px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 400;
+            margin-top: 5px;
+            border: 1px solid rgba(220, 38, 38, 0.3);
+            letter-spacing: 0.5px;
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 19px 28px;
+            background: rgba(0, 0, 0, 0.3);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+
+        .autoplay-toggle {
+            position: absolute;
+            left: 50%;
+            top: -21px;
+            transform: translateX(-50%);
+            background: rgba(20, 20, 20, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 30px;
+            padding: 6px 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .autoplay-toggle:hover {
+            border-color: rgba(255, 255, 255, 0.4);
+            background: rgba(30, 30, 30, 0.95);
+        }
+
+        .autoplay-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+        }
+
+        .autoplay-text {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 300;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .autoplay-toggle.active {
+            border-color: rgba(34, 197, 94, 0.5);
+            background: rgba(34, 197, 94, 0.1);
+        }
+
+        .autoplay-toggle.active .autoplay-icon,
+        .autoplay-toggle.active .autoplay-text {
+            color: #22c55e;
+        }
+
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 2px;
+            background: rgba(34, 197, 94, 0.6);
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        .nav-button {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 44px;
+            height: 44px;
+            border-radius: 4px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-button:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .nav-button:disabled {
+            opacity: 0.2;
+            cursor: not-allowed;
+        }
+
+        .day-selector {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .day-selector select {
+            padding: 8px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 300;
+            color: #ffffff;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .day-selector select:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .day-info {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        .core-badge {
+            display: inline-block;
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 9px;
+            font-weight: 400;
+            margin-left: 8px;
+            letter-spacing: 1px;
+            border: 1px solid rgba(251, 191, 36, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .carousel-header h1 {
+                font-size: 17px;
+            }
+
+            .carousel-header p {
+                font-size: 10px;
+            }
+
+            .affirmation-card {
+                padding: 19px 17px;
+            }
+
+            .affirmation-text {
+                font-size: 17px;
+            }
+
+            .controls {
+                padding: 15px;
+                flex-wrap: wrap;
+                gap: 11px;
+            }
+
+            .day-selector {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .autoplay-toggle {
+                top: -17px;
+                padding: 5px 13px;
+            }
+
+            .autoplay-icon {
+                width: 17px;
+                height: 17px;
+                font-size: 11px;
+            }
+
+            .autoplay-text {
+                font-size: 9px;
+            }
+
+            .card-container {
+                min-height: 333px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="carousel-container">
+        <div class="carousel-header">
+            <h1>SPIRITUAL AFFIRMATIONS</h1>
+            <p>Keep Yourself Spiritually Built-Up So You Can Approach Life's Physical Challenges With Confidence</p>
+        </div>
+
+        <div class="card-container" id="cardContainer"></div>
+
+        <div class="controls">
+            <div class="autoplay-toggle" id="autoplayToggle">
+                <div class="autoplay-icon" id="autoplayIcon">▶</div>
+                <div class="autoplay-text" id="autoplayText">Continuous Mode</div>
+            </div>
+            <div class="progress-bar" id="progressBar"></div>
+            <button class="nav-button" id="prevBtn">←</button>
+            <div class="day-selector">
+                <span class="day-info">Day</span>
+                <select id="daySelect"></select>
+                <span class="day-info">of 50</span>
+            </div>
+            <button class="nav-button" id="nextBtn">→</button>
+        </div>
+    </div>
+
+    <script>
+        const affirmations = [
+            { day: 1, affirmation: "I am loved and accepted by God.", scripture: "Romans 8:38-39", application: "Meditate on God's love during moments of self-doubt.", spirit: "Spirit of Rejection" },
+            { day: 2, affirmation: "I have not been given a spirit of fear but of power, love, and self-control.", scripture: "2 Timothy 1:7", application: "Declare this when feeling anxious or overwhelmed.", spirit: "Spirit of Fear" },
+            { day: 3, affirmation: "I am free from condemnation through Christ Jesus.", scripture: "Romans 8:1", application: "Reflect on this truth when guilt weighs heavily on you.", spirit: "Spirit of Condemnation" },
+            { day: 4, affirmation: "I am God's workmanship, created for good works.", scripture: "Ephesians 2:10", application: "Embrace this when struggling with self-worth.", spirit: "Spirit of Inferiority" },
+            { day: 5, affirmation: "Greater is He who is in me than he who is in the world.", scripture: "1 John 4:4", application: "Use this affirmation when facing spiritual challenges.", spirit: "Spirit of Defeat" },
+            { day: 6, affirmation: "I am more than a conqueror through Christ.", scripture: "Romans 8:37", application: "Speak this in moments of trials and adversity.", spirit: "Spirit of Hopelessness" },
+            { day: 7, affirmation: "God's peace guards my heart and mind.", scripture: "Philippians 4:7", application: "Practice gratitude and prayer to anchor your peace.", spirit: "Spirit of Anxiety" },
+            { day: 8, affirmation: "The Lord is my strength and my shield.", scripture: "Psalm 28:7", application: "Trust in God's protection when feeling vulnerable.", spirit: "Spirit of Vulnerability" },
+            { day: 9, affirmation: "I have the mind of Christ.", scripture: "1 Corinthians 2:16", application: "Speak this affirmation when struggling with confusion.", spirit: "Spirit of Confusion" },
+            { day: 10, affirmation: "I can do all things through Christ who strengthens me.", scripture: "Philippians 4:13", application: "Declare this in challenging situations.", spirit: "Spirit of Limitation" },
+            { day: 11, affirmation: "The Lord will fight for me; I need only to be still.", scripture: "Exodus 14:14", application: "Rest in this promise when feeling helpless.", spirit: "Spirit of Strife" },
+            { day: 12, affirmation: "I am rooted and grounded in God's love.", scripture: "Ephesians 3:17", application: "Meditate on God's love during moments of insecurity.", spirit: "Spirit of Insecurity", isCore: true },
+            { day: 13, affirmation: "My help comes from the Lord, who made heaven and earth.", scripture: "Psalm 121:2", application: "Look to God for strength in times of trouble.", spirit: "Spirit of Helplessness" },
+            { day: 14, affirmation: "God's grace is sufficient for me.", scripture: "2 Corinthians 12:9", application: "Depend on His grace when feeling inadequate.", spirit: "Spirit of Inadequacy" },
+            { day: 15, affirmation: "The joy of the Lord is my strength.", scripture: "Nehemiah 8:10", application: "Rejoice in God's faithfulness to renew your joy daily.", spirit: "Spirit of Despair" },
+            { day: 16, affirmation: "No weapon formed against me shall prosper.", scripture: "Isaiah 54:17", application: "Stand firm in faith during spiritual warfare.", spirit: "Spirit of Oppression" },
+            { day: 17, affirmation: "God's plans for me are to prosper and not to harm me.", scripture: "Jeremiah 29:11", application: "Trust in His plans when faced with uncertainty.", spirit: "Spirit of Doubt" },
+            { day: 18, affirmation: "I walk by faith, not by sight.", scripture: "2 Corinthians 5:7", application: "Act on faith when circumstances seem bleak.", spirit: "Spirit of Unbelief" },
+            { day: 19, affirmation: "God is my refuge and strength, a very present help in trouble.", scripture: "Psalm 46:1", application: "Lean on this truth when facing crises.", spirit: "Spirit of Fear" },
+            { day: 20, affirmation: "I am healed by His stripes.", scripture: "Isaiah 53:5", application: "Declare this over physical and emotional wounds.", spirit: "Spirit of Sickness" },
+            { day: 21, affirmation: "I have been redeemed and called by name by the Lord.", scripture: "Isaiah 43:1", application: "Remember this in moments of doubt about your identity.", spirit: "Spirit of Rejection" },
+            { day: 22, affirmation: "I am a new creation in Christ.", scripture: "2 Corinthians 5:17", application: "Let go of past mistakes and embrace your new life in Christ.", spirit: "Spirit of Shame" },
+            { day: 23, affirmation: "I am filled with the Holy Spirit and walk in power.", scripture: "Acts 1:8", application: "Pray for boldness and courage in your daily interactions.", spirit: "Spirit of Weakness" },
+            { day: 24, affirmation: "God's mercies are new every morning.", scripture: "Lamentations 3:23", application: "Start each day with gratitude and hope.", spirit: "Spirit of Discouragement" },
+            { day: 25, affirmation: "I will trust in the Lord with all my heart.", scripture: "Proverbs 3:5", application: "Choose trust over worry in decision-making.", spirit: "Spirit of Doubt" },
+            { day: 26, affirmation: "I am blessed with every spiritual blessing in Christ.", scripture: "Ephesians 1:3", application: "Celebrate your inheritance in Christ daily.", spirit: "Spirit of Lack" },
+            { day: 27, affirmation: "The Lord is my Shepherd; I shall not want.", scripture: "Psalm 23:1", application: "Rest in God's provision and guidance.", spirit: "Spirit of Lack" },
+            { day: 28, affirmation: "I cast all my cares on Him because He cares for me.", scripture: "1 Peter 5:7", application: "Practice surrendering worries to God through prayer.", spirit: "Spirit of Anxiety" },
+            { day: 29, affirmation: "I am chosen and dearly loved by God.", scripture: "Colossians 3:12", application: "Reflect on your worth in God's eyes.", spirit: "Spirit of Rejection" },
+            { day: 30, affirmation: "I will not grow weary in doing good.", scripture: "Galatians 6:9", application: "Persist in kindness and service despite challenges.", spirit: "Spirit of Weariness" },
+            { day: 31, affirmation: "The Lord is my light and my salvation—whom shall I fear?", scripture: "Psalm 27:1", application: "Focus on God's light when fear arises.", spirit: "Spirit of Fear" },
+            { day: 32, affirmation: "I am the head and not the tail, above and not beneath.", scripture: "Deuteronomy 28:13", application: "Walk confidently in God's promises for your life.", spirit: "Spirit of Defeat" },
+            { day: 33, affirmation: "I will be still and know that He is God.", scripture: "Psalm 46:10", application: "Pause and meditate in moments of chaos.", spirit: "Spirit of Strife" },
+            { day: 34, affirmation: "My God will supply all my needs according to His riches in glory.", scripture: "Philippians 4:19", application: "Trust God's provision in financial or emotional lack.", spirit: "Spirit of Poverty" },
+            { day: 35, affirmation: "I am clothed with strength and dignity.", scripture: "Proverbs 31:25", application: "Walk confidently in your God-given identity.", spirit: "Spirit of Shame" },
+            { day: 36, affirmation: "God's word is a lamp to my feet and a light to my path.", scripture: "Psalm 119:105", application: "Use Scripture as guidance for decisions and direction.", spirit: "Spirit of Confusion" },
+            { day: 37, affirmation: "I am victorious through Christ.", scripture: "1 Corinthians 15:57", application: "Rejoice in every victory, big or small.", spirit: "Spirit of Defeat" },
+            { day: 38, affirmation: "God has not forgotten me.", scripture: "Isaiah 49:15-16", application: "Rest in this truth during moments of loneliness.", spirit: "Spirit of Abandonment" },
+            { day: 39, affirmation: "The Lord's faithfulness is my shield.", scripture: "Psalm 91:4", application: "Rely on God's faithfulness when feeling uncertain.", spirit: "Spirit of Uncertainty" },
+            { day: 40, affirmation: "I will rejoice always and give thanks in all circumstances.", scripture: "1 Thessalonians 5:16-18", application: "Cultivate a habit of gratitude in all situations.", spirit: "Spirit of Complaining" },
+            { day: 41, affirmation: "I am a friend of God.", scripture: "John 15:15", application: "Find comfort in God's closeness during isolation.", spirit: "Spirit of Loneliness" },
+            { day: 42, affirmation: "I am free in Christ, and I stand firm in my freedom.", scripture: "Galatians 5:1", application: "Refuse to return to old habits or bondages.", spirit: "Spirit of Bondage" },
+            { day: 43, affirmation: "God's perfect love casts out fear.", scripture: "1 John 4:18", application: "Seek God's love when fear creeps in.", spirit: "Spirit of Fear" },
+            { day: 44, affirmation: "I am seated in heavenly places with Christ.", scripture: "Ephesians 2:6", application: "View life from a place of victory, not defeat.", spirit: "Spirit of Defeat" },
+            { day: 45, affirmation: "I am a child of God and a co-heir with Christ.", scripture: "Romans 8:17", application: "Celebrate your spiritual inheritance and identity.", spirit: "Spirit of Orphanhood" },
+            { day: 46, affirmation: "The Lord will never leave me nor forsake me.", scripture: "Hebrews 13:5", application: "Trust God's presence in seasons of doubt.", spirit: "Spirit of Abandonment" },
+            { day: 47, affirmation: "I have been given authority to overcome all the power of the enemy.", scripture: "Luke 10:19", application: "Pray with boldness against spiritual attacks.", spirit: "Spirit of Powerlessness" },
+            { day: 48, affirmation: "The peace of Christ rules in my heart.", scripture: "Colossians 3:15", application: "Choose peace over conflict in daily interactions.", spirit: "Spirit of Strife" },
+            { day: 49, affirmation: "I am forgiven and set free.", scripture: "John 8:36", application: "Release yourself and others from past wrongs.", spirit: "Spirit of Bitterness" },
+            { day: 50, affirmation: "I will fix my eyes on Jesus, the author and perfecter of my faith.", scripture: "Hebrews 12:2", application: "Focus on Jesus in times of distraction or discouragement.", spirit: "Spirit of Distraction" }
+        ];
+
+        let currentDay = 0;
+        let autoplayEnabled = false;
+        let autoplayInterval = null;
+        let progressInterval = null;
+        const autoplayDelay = 5000;
+
+        const cardContainer = document.getElementById('cardContainer');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const daySelect = document.getElementById('daySelect');
+        const autoplayToggle = document.getElementById('autoplayToggle');
+        const autoplayIcon = document.getElementById('autoplayIcon');
+        const autoplayText = document.getElementById('autoplayText');
+        const progressBar = document.getElementById('progressBar');
+
+        function createCard(data) {
+            return `
+                <div class="affirmation-card" data-day="${data.day}">
+                    <div class="day-badge">
+                        Day ${data.day}
+                        ${data.isCore ? '<span class="core-badge">⭐ CORE</span>' : ''}
+                    </div>
+                    <div class="affirmation-text">"${data.affirmation}"</div>
+                    <div class="detail-section">
+                        <h3>SCRIPTURE</h3>
+                        <p class="scripture-ref">${data.scripture}</p>
+                    </div>
+                    <div class="detail-section">
+                        <h3>DAILY APPLICATION</h3>
+                        <p>${data.application}</p>
+                    </div>
+                    <div class="detail-section">
+                        <h3>COMBATS</h3>
+                        <span class="spirit-tag">${data.spirit}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function initCarousel() {
+            affirmations.forEach(data => {
+                cardContainer.innerHTML += createCard(data);
+            });
+
+            for (let i = 1; i <= 50; i++) {
+                const option = document.createElement('option');
+                option.value = i - 1;
+                option.textContent = i;
+                daySelect.appendChild(option);
+            }
+
+            showCard(0);
+        }
+
+        function showCard(index) {
+            const cards = document.querySelectorAll('.affirmation-card');
+            
+            cards.forEach((card, i) => {
+                card.classList.remove('active', 'prev');
+                if (i === index) {
+                    card.classList.add('active');
+                } else if (i < index) {
+                    card.classList.add('prev');
+                }
+            });
+
+            currentDay = index;
+            daySelect.value = index;
+
+            prevBtn.disabled = index === 0;
+            nextBtn.disabled = index === affirmations.length - 1;
+
+            if (autoplayEnabled) {
+                resetProgress();
+            }
+        }
+
+        function startAutoplay() {
+            autoplayEnabled = true;
+            autoplayToggle.classList.add('active');
+            autoplayIcon.textContent = '❚❚';
+            autoplayText.textContent = 'Playing';
+            
+            autoplayInterval = setInterval(() => {
+                if (currentDay < affirmations.length - 1) {
+                    showCard(currentDay + 1);
+                } else {
+                    showCard(0);
+                }
+            }, autoplayDelay);
+
+            startProgress();
+        }
+
+        function stopAutoplay() {
+            autoplayEnabled = false;
+            autoplayToggle.classList.remove('active');
+            autoplayIcon.textContent = '▶';
+            autoplayText.textContent = 'Continuous Mode';
+            
+            if (autoplayInterval) {
+                clearInterval(autoplayInterval);
+                autoplayInterval = null;
+            }
+            
+            stopProgress();
+        }
+
+        function startProgress() {
+            stopProgress();
+            progressBar.style.width = '0%';
+            
+            let progress = 0;
+            progressInterval = setInterval(() => {
+                progress += 100 / (autoplayDelay / 100);
+                progressBar.style.width = Math.min(progress, 100) + '%';
+                
+                if (progress >= 100) {
+                    progressBar.style.width = '0%';
+                    progress = 0;
+                }
+            }, 100);
+        }
+
+        function stopProgress() {
+            if (progressInterval) {
+                clearInterval(progressInterval);
+                progressInterval = null;
+            }
+            progressBar.style.width = '0%';
+        }
+
+        function resetProgress() {
+            if (autoplayEnabled) {
+                stopProgress();
+                startProgress();
+            }
+        }
+
+        autoplayToggle.addEventListener('click', () => {
+            if (autoplayEnabled) {
+                stopAutoplay();
+            } else {
+                startAutoplay();
+            }
+        });
+
+        prevBtn.addEventListener('click', () => {
+            if (currentDay > 0) {
+                stopAutoplay();
+                showCard(currentDay - 1);
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentDay < affirmations.length - 1) {
+                stopAutoplay();
+                showCard(currentDay + 1);
+            }
+        });
+
+        daySelect.addEventListener('change', (e) => {
+            stopAutoplay();
+            showCard(parseInt(e.target.value));
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft' && currentDay > 0) {
+                stopAutoplay();
+                showCard(currentDay - 1);
+            } else if (e.key === 'ArrowRight' && currentDay < affirmations.length - 1) {
+                stopAutoplay();
+                showCard(currentDay + 1);
+            } else if (e.key === ' ' || e.key === 'Spacebar') {
+                e.preventDefault();
+                if (autoplayEnabled) {
+                    stopAutoplay();
+                } else {
+                    startAutoplay();
+                }
+            }
+        });
+
+        initCarousel();
+    </script>
+</body>
+</html>
